@@ -64,7 +64,7 @@ class Post extends Component
 
     public function addComment($postId){
         $this->commentModel->create([
-            'user_id' => 1,
+            'user_id' =>  auth()->user()->id,
             'post_id' => $postId,
             'comment' => $this->comment[$postId],
         ]);

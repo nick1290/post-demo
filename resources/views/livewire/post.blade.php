@@ -80,6 +80,11 @@
                     </div>
                 </div>
             @empty
+            <div class="card mb-3">
+                <div class="card-body">
+                   <h5> No Posts Found!</h5>
+                </div>
+            </div>
             @endforelse
         </div>
     </div>
