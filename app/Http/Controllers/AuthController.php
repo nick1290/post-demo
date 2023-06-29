@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Post;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Session;
@@ -59,7 +60,19 @@ class AuthController extends Controller
     public function dashboard()
     {
         if (Auth::check()) {
-            return view('welcome');
+            /* Find users having one or more post along with other users */
+            $users = User::with(['posts'])->has('posts', '>', 1)->get();
+            $otherUsers = User::whereNotIn('id',User::with(['posts'])->has('posts', '>', 1)->pluck('id'))->get();
+            $users = $users->merge($otherUsers);
+            $users->map(function($user){
+                $user->postCount = Post::whereUserId($user->id)->count();
+            });
+
+            /* Find Users whose name includes letter m */
+            $usersWithM = User::where('name', 'LIKE', '%m%')->get();
+            $usersWithoutM  = User::where('name', 'NOT LIKE', '%m%')->get();
+            $usersWithLetter = $usersWithM->merge($usersWithoutM);
+            return view('welcome',compact('users','usersWithLetter'));
         }
 
         return redirect("login")->withSuccess('Opps! You do not have access');
